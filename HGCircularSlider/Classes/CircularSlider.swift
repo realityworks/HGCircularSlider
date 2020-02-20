@@ -173,6 +173,16 @@ open class CircularSlider: UIControl {
     }
 
     /**
+      * Angle in radians of the starting point for the track. Defaults to -π/2 (top position).
+      */
+     @IBInspectable
+     open var circleInitialAngle: CGFloat = CircularSliderHelper.circleInitialAngle {
+         didSet {
+             setNeedsDisplay()
+         }
+     }
+    
+    /**
     * The offset of the thumb centre from the circle.
     *
     * You can use this to move the thumb inside or outside the circle of the slider
@@ -278,10 +288,11 @@ open class CircularSlider: UIControl {
         drawCircularSlider(inContext: context)
         
         let valuesInterval = Interval(min: minimumValue, max: maximumValue, rounds: numberOfRounds)
-        // get end angle from end value
-        let endAngle = CircularSliderHelper.scaleToAngle(value: endPointValue, inInterval: valuesInterval) + CircularSliderHelper.circleInitialAngle
         
-        drawFilledArc(fromAngle: CircularSliderHelper.circleInitialAngle, toAngle: endAngle, inContext: context)
+        // get end angle from end value
+        let endAngle = CircularSliderHelper.scaleToAngle(value: endPointValue, inInterval: valuesInterval) + circleInitialAngle
+        
+        drawFilledArc(fromAngle: circleInitialAngle, toAngle: endAngle, inContext: context)
         
         // draw end thumb
         endThumbTintColor.setFill()
@@ -307,7 +318,10 @@ open class CircularSlider: UIControl {
     override open func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
         // the position of the pan gesture
         let touchPosition = touch.location(in: self)
-        let startPoint = CGPoint(x: bounds.center.x, y: 0)
+        
+        let zeroPoint = CGPoint(x: bounds.maxX, y: bounds.center.y)
+        let startPoint = zeroPoint.rotate(around: bounds.center, with: circleInitialAngle)
+        
         let value = newValue(from: endPointValue, touch: touchPosition, start: startPoint)
         
         endPointValue = value
