@@ -41,6 +41,16 @@ open class CircularSlider: UIControl {
     open var trackFillColor: UIColor = .clear
     
     /**
+     * The gradient list shown from the start of the arc to the end of the arc. The start of the arc
+     * is always at colour 0 and the end of the arc is at colour **n-1**. If **trackFillColors** is **nil**, then the track
+     * will be filled with the single **trackFillColor** variable.
+     */
+    @IBInspectable
+    open var trackFillColors: [UIColor]? = nil
+    
+    
+    
+    /**
      * The color shown for the unselected track portion. (outside start and end values)
      * The default value of this property is the white color.
      */

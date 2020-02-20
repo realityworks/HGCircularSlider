@@ -11,6 +11,40 @@ import UIKit
 extension CircularSlider {
     
     /**
+     * Draw arc that will have it's stroke path filled with a linear or radial gradient.
+     *
+     *
+     - parameter arc:           the arc coordinates (origin, radius, start angle, end angle)
+     - parameter lineWidth:     the with of the circle line (optional) by default 2px
+     - parameter context:       the context
+     */
+    internal static func drawGradientArc(withArc arc: Arc, lineWidth: CGFloat = 2, inContext context: CGContext) {
+        let circle = arc.circle
+        let origin = circle.origin
+        
+        let colors: [CGColor] = [UIColor.green.cgColor, UIColor.blue.cgColor]
+        let locations: [CGFloat] = [0.0, 1.0]
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: locations)
+        
+        UIGraphicsPushContext(context)
+        context.saveGState()
+        context.beginPath()
+        
+        context.setLineWidth(lineWidth)
+        context.setLineCap(CGLineCap.round)
+        context.addArc(center: origin, radius: circle.radius, startAngle: arc.startAngle, endAngle: arc.endAngle, clockwise: false)
+        context.move(to: CGPoint(x: origin.x, y: origin.y))
+
+        context.replacePathWithStrokedPath()
+        context.clip()
+        if let gradient = gradient {
+            context.drawLinearGradient(gradient, start: CGPoint(x: 0, y: 0), end: CGPoint(x: 0, y: 600), options: .drawsBeforeStartLocation)
+        }
+        context.restoreGState()
+        UIGraphicsPopContext()
+    }
+    /**
      Draw arc with stroke mode (Stroke) or Disk (Fill) or both (FillStroke) mode
      FillStroke used by default
      
@@ -33,7 +67,7 @@ extension CircularSlider {
         context.addArc(center: origin, radius: circle.radius, startAngle: arc.startAngle, endAngle: arc.endAngle, clockwise: false)
         context.move(to: CGPoint(x: origin.x, y: origin.y))
         context.drawPath(using: mode)
-        
+
         UIGraphicsPopContext()
     }
     
@@ -49,13 +83,14 @@ extension CircularSlider {
         let origin = circle.origin
 
         UIGraphicsPushContext(context)
+        
         context.beginPath()
-
+        
         context.setLineWidth(0)
         context.addArc(center: origin, radius: circle.radius, startAngle: arc.startAngle, endAngle: arc.endAngle, clockwise: false)
         context.addLine(to: CGPoint(x: origin.x, y: origin.y))
         context.drawPath(using: .fill)
-
+        
         UIGraphicsPopContext()
     }
 
@@ -75,14 +110,15 @@ extension CircularSlider {
     internal func drawFilledArc(fromAngle startAngle: CGFloat, toAngle endAngle: CGFloat, inContext context: CGContext) {
         diskFillColor.setFill()
         trackFillColor.setStroke()
-
+        
         let circle = Circle(origin: bounds.center, radius: self.radius)
         let arc = Arc(circle: circle, startAngle: startAngle, endAngle: endAngle)
         
         // fill Arc
         CircularSlider.drawDisk(withArc: arc, inContext: context)
+        
         // stroke Arc
-        CircularSlider.drawArc(withArc: arc, lineWidth: lineWidth, mode: .stroke, inContext: context)
+        CircularSlider.drawGradientArc(withArc: arc, lineWidth: lineWidth, inContext: context)
     }
 
     internal func drawShadowArc(fromAngle startAngle: CGFloat, toAngle endAngle: CGFloat, inContext context: CGContext) {
