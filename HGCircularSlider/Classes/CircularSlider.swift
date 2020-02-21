@@ -110,6 +110,14 @@ open class CircularSlider: UIControl {
     open var thumbRadius: CGFloat = 13.0
     
     /**
+     * Flag indicating whether thumbs should be shadowed
+     *
+     * The default value of this property is **true**.
+     */
+    @IBInspectable
+    open var thumbShadow: Bool = false
+    
+    /**
      * The color used to tint the thumb
      * Ignored if the endThumbImage != nil
      *

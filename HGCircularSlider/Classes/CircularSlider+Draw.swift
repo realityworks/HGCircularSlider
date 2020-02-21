@@ -72,7 +72,7 @@ extension CircularSlider {
      - parameter context:       the context
      
      */
-    internal static func drawArc(withArc arc: Arc, lineWidth: CGFloat = 2, mode: CGPathDrawingMode = .fillStroke, inContext context: CGContext) {
+    internal static func drawArc(withArc arc: Arc, lineWidth: CGFloat = 2, mode: CGPathDrawingMode = .fillStroke, inContext context: CGContext, withShadow shadowed: Bool = false) {
         
         let circle = arc.circle
         let origin = circle.origin
@@ -84,6 +84,11 @@ extension CircularSlider {
         context.setLineCap(CGLineCap.round)
         context.addArc(center: origin, radius: circle.radius, startAngle: arc.startAngle, endAngle: arc.endAngle, clockwise: false)
         context.move(to: CGPoint(x: origin.x, y: origin.y))
+        
+        if shadowed {
+            context.setShadow(offset: .zero, blur: circle.radius, color: UIColor.black.cgColor)
+        }
+        
         context.drawPath(using: mode)
 
         UIGraphicsPopContext()
@@ -121,7 +126,11 @@ extension CircularSlider {
 
         let circle = Circle(origin: bounds.center, radius: self.radius)
         let sliderArc = Arc(circle: circle, startAngle: CircularSliderHelper.circleMinValue, endAngle: CircularSliderHelper.circleMaxValue)
-        CircularSlider.drawArc(withArc: sliderArc, lineWidth: backtrackLineWidth, inContext: context)
+        
+        CircularSlider.drawArc(
+            withArc: sliderArc,
+            lineWidth: backtrackLineWidth,
+            inContext: context)
     }
 
     /// draw Filled arc between start an end angles
@@ -183,7 +192,8 @@ extension CircularSlider {
         let thumbCircle = Circle(origin: thumbOrigin, radius: thumbRadius)
         let thumbArc = Arc(circle: thumbCircle, startAngle: CircularSliderHelper.circleMinValue, endAngle: CircularSliderHelper.circleMaxValue)
 
-        CircularSlider.drawArc(withArc: thumbArc, lineWidth: thumbLineWidth, inContext: context)
+        CircularSlider.drawArc(withArc: thumbArc, lineWidth: thumbLineWidth, inContext: context, withShadow: thumbShadow)
+                
         return thumbOrigin
     }
 
