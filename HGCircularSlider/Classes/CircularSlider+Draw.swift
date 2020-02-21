@@ -18,15 +18,30 @@ extension CircularSlider {
      - parameter lineWidth:     the with of the circle line (optional) by default 2px
      - parameter context:       the context
      */
-    internal static func drawGradientArc(withArc arc: Arc, lineWidth: CGFloat = 2, inContext context: CGContext) {
+    internal static func drawGradientArc(withArc arc: Arc,
+                                         colors: [CGColor],
+                                         locations: [CGFloat],
+                                         frame: CGRect,
+                                         lineWidth: CGFloat = 2,
+                                         cachedGradientImage: inout CGImage?,
+                                         inContext context: CGContext) {
+        
+        if cachedGradientImage == nil {
+            UIGraphicsPushContext(context)
+            cachedGradientImage = gradientImage(
+                type: .conical,
+                size: frame.size,
+                colors: colors,
+                locations: locations.map { Float($0) },
+                scale: 0.4)
+            
+            cachedGradientImage = createMatchingBackingDataWithImage(imageRef: cachedGradientImage, customRotation: 92.0, customMirrored: true, customSwapWidthHeight: true)
+            
+        }
+        
         let circle = arc.circle
         let origin = circle.origin
-        
-        let colors: [CGColor] = [UIColor.green.cgColor, UIColor.blue.cgColor]
-        let locations: [CGFloat] = [0.0, 1.0]
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: locations)
-        
+                
         UIGraphicsPushContext(context)
         context.saveGState()
         context.beginPath()
@@ -38,9 +53,12 @@ extension CircularSlider {
 
         context.replacePathWithStrokedPath()
         context.clip()
-        if let gradient = gradient {
-            context.drawLinearGradient(gradient, start: CGPoint(x: 0, y: 0), end: CGPoint(x: 0, y: 600), options: .drawsBeforeStartLocation)
+        
+        // Cache this later
+        if let image = cachedGradientImage {
+            context.draw(image, in: CGRect(origin: .zero, size: frame.size))
         }
+        
         context.restoreGState()
         UIGraphicsPopContext()
     }
@@ -118,7 +136,18 @@ extension CircularSlider {
         CircularSlider.drawDisk(withArc: arc, inContext: context)
         
         // stroke Arc
-        CircularSlider.drawGradientArc(withArc: arc, lineWidth: lineWidth, inContext: context)
+        if trackFillColors.count > 0 {
+            CircularSlider.drawGradientArc(
+                withArc: arc,
+                colors: trackFillColors.map { $0.cgColor },
+                locations: trackFillColorLocations,
+                frame: frame,
+                lineWidth: lineWidth,
+                cachedGradientImage: &cachedGradientImage,
+                inContext: context)
+        } else {
+            CircularSlider.drawArc(withArc: arc, lineWidth: lineWidth, mode: .stroke, inContext: context)
+        }
     }
 
     internal func drawShadowArc(fromAngle startAngle: CGFloat, toAngle endAngle: CGFloat, inContext context: CGContext) {

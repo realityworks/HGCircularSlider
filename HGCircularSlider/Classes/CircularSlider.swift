@@ -46,9 +46,13 @@ open class CircularSlider: UIControl {
      * will be filled with the single **trackFillColor** variable.
      */
     @IBInspectable
-    open var trackFillColors: [UIColor]? = nil
+    open var trackFillColors: [UIColor] = []
     
-    
+    /**
+     * The locations for the track fill colors on the gradient. Values are 0 - 1
+     */
+    @IBInspectable
+    open var trackFillColorLocations: [CGFloat] = []
     
     /**
      * The color shown for the unselected track portion. (outside start and end values)
@@ -261,6 +265,8 @@ open class CircularSlider: UIControl {
             setNeedsDisplay()
         }
     }
+    
+    internal var cachedGradientImage: CGImage? = nil
     
     // MARK: init methods
     
