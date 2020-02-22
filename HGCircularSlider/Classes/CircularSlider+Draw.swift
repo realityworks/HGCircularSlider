@@ -27,7 +27,6 @@ extension CircularSlider {
                                          inContext context: CGContext) {
         
         if cachedGradientImage == nil {
-            UIGraphicsPushContext(context)
             cachedGradientImage = gradientImage(
                 type: .conical,
                 size: frame.size,
