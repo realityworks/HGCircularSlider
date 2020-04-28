@@ -530,7 +530,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = U9E7JWZWR9;
+				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=*]" = 62L4CLZDFB;
 				INFOPLIST_FILE = HGCircularSlider/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
